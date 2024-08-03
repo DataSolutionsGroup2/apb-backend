@@ -16,12 +16,12 @@ app.use(express.json());
 // Middleware para permitir requisições de qualquer domínio
 app.use(cors());
 
-// Testando a conexão com o PostgreSQL remoto
+// Testando a conexão com bd remoto
 pool.connect((err, client, release) => {
   if (err) {
     return console.error("Erro ao conectar ao PostgreSQL:", err);
   }
-  console.log("Conectado ao PostgreSQL no Railway!");
+  console.log("Conectado ao bd!");
 
   // Libera o cliente de volta à pool
   release();
