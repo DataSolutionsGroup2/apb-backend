@@ -1,32 +1,41 @@
 import { Request, Response } from "express";
-import pool from "./db"; // Importa a pool de conexão
+import { MongoClient } from "mongodb";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 
 dotenv.config();
 
 const SECRET_KEY = process.env.SECRET_KEY || "default_secret_key";
+const DB_NAME = "abp"; // Substitua pelo nome do seu banco de dados
+
+// Importa a instância do MongoClient (pool)
+import pool from "./db";
 
 class AuthController {
   async login(req: Request, res: Response) {
     const { nome, senha } = req.body;
 
     try {
-      const queryText = `
-        SELECT * FROM congregacao WHERE nome = $1 AND senha = $2;
-      `;
-      const result = await pool.query(queryText, [nome, senha]);
+      // Usa o pool de conexão existente (assumindo que é uma instância do MongoClient)
+      const client: MongoClient = pool;
+      const db = client.db(DB_NAME);
+      const collection = db.collection("login");
 
-      if (result.rows.length === 1) {
-        const userData = result.rows[0]; // Pega os dados do usuário
+      // Consulta o usuário no MongoDB
+      const user = await collection.findOne({ nome, senha });
 
+      if (user) {
         // Remove a senha dos dados do usuário
-        const { senha, ...userWithoutPassword } = userData;
+        const { senha, ...userWithoutPassword } = user;
 
         // Cria um token JWT
-        const token = jwt.sign({ id: userWithoutPassword.id }, SECRET_KEY, {
-          expiresIn: "1h",
-        });
+        const token = jwt.sign(
+          { id: userWithoutPassword._id.toString() },
+          SECRET_KEY,
+          {
+            expiresIn: "1h",
+          }
+        );
 
         // Retorna o token e os dados do usuário sem a senha
         res.status(200).json({ token, user: userWithoutPassword });
