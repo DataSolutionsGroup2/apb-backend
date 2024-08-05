@@ -13,7 +13,7 @@ import pool from "./db";
 
 class AuthController {
   async login(req: Request, res: Response) {
-    const { nome, senha } = req.body;
+    const { email, senha } = req.body;
 
     try {
       // Usa o pool de conexão existente (assumindo que é uma instância do MongoClient)
@@ -22,7 +22,7 @@ class AuthController {
       const collection = db.collection("login");
 
       // Consulta o usuário no MongoDB
-      const user = await collection.findOne({ nome, senha });
+      const user = await collection.findOne({ email, senha });
 
       if (user) {
         // Remove a senha dos dados do usuário
