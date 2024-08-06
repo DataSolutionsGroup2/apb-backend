@@ -1,6 +1,6 @@
 import express from "express";
 import AuthController from "../Controladores/PostLogin";
-import Cadastro from "../Controladores/CadastroRecuperação";
+import Cadastro from "../Controladores/Cadastro";
 import RedefinicaoSenha from "../Controladores/RecuperaçãoSenha";
 import EmailController from "../Controladores/PostResetSenha";
 

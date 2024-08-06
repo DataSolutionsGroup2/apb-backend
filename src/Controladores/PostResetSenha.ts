@@ -22,10 +22,6 @@ class EmailController {
     });
   }
 
-  private generateCode(): string {
-    return Math.floor(100000 + Math.random() * 900000).toString();
-  }
-
   async enviarEmailDeRecuperacao(req: Request, res: Response) {
     const { email } = req.body;
 
@@ -44,24 +40,19 @@ class EmailController {
       return res.status(404).json({ error: "Usuário não encontrado" });
     }
 
-    const code = this.generateCode();
+    const { recoveryCode } = user;
 
-    // Atualiza o usuário com o código de recuperação
-    await collection.updateOne(
-      { email },
-      {
-        $set: {
-          recoveryCode: code,
-          recoveryCodeExpires: new Date(Date.now() + 3600000),
-        },
-      } // Expira em 1 hora
-    );
+    if (!recoveryCode) {
+      return res
+        .status(400)
+        .json({ error: "Código de recuperação não encontrado" });
+    }
 
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: email,
       subject: "Recuperação de Senha",
-      text: `Você solicitou a recuperação de senha. Use o código a seguir para redefinir sua senha: ${code}`,
+      text: `Você solicitou a recuperação de senha. Use o código a seguir para redefinir sua senha: ${recoveryCode}`,
     };
 
     try {
@@ -72,6 +63,8 @@ class EmailController {
     } catch (error) {
       console.error("Erro ao enviar email:", error);
       res.status(500).json({ error: "Erro ao enviar email de recuperação" });
+    } finally {
+      await client.close(); // Fechar a conexão com o banco de dados
     }
   }
 }

@@ -11,12 +11,12 @@ const DB_NAME = "abp";
 
 import pool from "./db";
 
-class Casdastro {
+class Cadastro {
   async login(req: Request, res: Response) {
     const { email, senha } = req.body;
 
     try {
-      const client: MongoClient = pool;
+      const client: MongoClient = await pool.connect(); // Certifique-se de obter uma conexão do pool
       const db = client.db(DB_NAME);
       const collection = db.collection("login");
 
@@ -38,6 +38,8 @@ class Casdastro {
     } catch (error) {
       console.error("Erro:", error);
       res.status(500).json({ error: "Erro interno do servidor" });
+    } finally {
+      await pool.close();
     }
   }
 
@@ -45,7 +47,7 @@ class Casdastro {
     const { email, senha, nome } = req.body;
 
     try {
-      const client: MongoClient = pool;
+      const client: MongoClient = await pool.connect(); // Certifique-se de obter uma conexão do pool
       const db = client.db(DB_NAME);
       const collection = db.collection("login");
 
@@ -57,10 +59,16 @@ class Casdastro {
 
       const hashedPassword = bcrypt.hashSync(senha, 10);
 
+      // Gera um código de recuperação de 6 dígitos
+      const recoveryCode = Math.floor(
+        100000 + Math.random() * 900000
+      ).toString();
+
       const newUser = {
         email,
         senha: hashedPassword,
         nome,
+        recoveryCode,
         createdAt: new Date(),
       };
 
@@ -78,8 +86,10 @@ class Casdastro {
     } catch (error) {
       console.error("Erro:", error);
       res.status(500).json({ error: "Erro interno do servidor" });
+    } finally {
+      await pool.close();
     }
   }
 }
 
-export default Casdastro;
+export default Cadastro;
