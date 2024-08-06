@@ -1,5 +1,13 @@
 import express, { Request, Response } from "express";
 import nodemailer from "nodemailer";
+import dotenv from "dotenv";
+import { MongoClient } from "mongodb";
+
+dotenv.config(); // Carregar variáveis de ambiente do arquivo .env
+
+const DB_NAME = "abp";
+
+import pool from "./db";
 
 class EmailController {
   private transporter: nodemailer.Transporter;
@@ -14,6 +22,10 @@ class EmailController {
     });
   }
 
+  private generateCode(): string {
+    return Math.floor(100000 + Math.random() * 900000).toString();
+  }
+
   async enviarEmailDeRecuperacao(req: Request, res: Response) {
     const { email } = req.body;
 
@@ -21,15 +33,35 @@ class EmailController {
       return res.status(400).json({ error: "Email não fornecido" });
     }
 
-    const baseUrl = process.env.BASE_URL;
-    const token = "token";
-    const resetLink = `${baseUrl}/reset-password?token=${token}`;
+    const client: MongoClient = await pool.connect();
+    const db = client.db(DB_NAME);
+    const collection = db.collection("login");
+
+    // Verifica se o usuário existe
+    const user = await collection.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ error: "Usuário não encontrado" });
+    }
+
+    const code = this.generateCode();
+
+    // Atualiza o usuário com o código de recuperação
+    await collection.updateOne(
+      { email },
+      {
+        $set: {
+          recoveryCode: code,
+          recoveryCodeExpires: new Date(Date.now() + 3600000),
+        },
+      } // Expira em 1 hora
+    );
 
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: email,
       subject: "Recuperação de Senha",
-      text: `Você solicitou a recuperação de senha. Clique no link a seguir para redefinir sua senha: ${resetLink}`,
+      text: `Você solicitou a recuperação de senha. Use o código a seguir para redefinir sua senha: ${code}`,
     };
 
     try {

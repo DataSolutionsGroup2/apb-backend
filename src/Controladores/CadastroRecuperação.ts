@@ -11,7 +11,7 @@ const DB_NAME = "abp";
 
 import pool from "./db";
 
-class CasdastroErecuperacao {
+class Casdastro {
   async login(req: Request, res: Response) {
     const { email, senha } = req.body;
 
@@ -20,7 +20,6 @@ class CasdastroErecuperacao {
       const db = client.db(DB_NAME);
       const collection = db.collection("login");
 
-      // Consulta o usuário no MongoDB
       const user = await collection.findOne({ email });
 
       if (user && bcrypt.compareSync(senha, user.senha)) {
@@ -50,17 +49,14 @@ class CasdastroErecuperacao {
       const db = client.db(DB_NAME);
       const collection = db.collection("login");
 
-      // Verifica se o usuário já existe
       const existingUser = await collection.findOne({ email });
 
       if (existingUser) {
         return res.status(400).json({ error: "Usuário já cadastrado" });
       }
 
-      // Criptografa a senha
       const hashedPassword = bcrypt.hashSync(senha, 10);
 
-      // Cria um novo usuário
       const newUser = {
         email,
         senha: hashedPassword,
@@ -86,4 +82,4 @@ class CasdastroErecuperacao {
   }
 }
 
-export default CasdastroErecuperacao;
+export default Casdastro;
