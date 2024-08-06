@@ -15,11 +15,18 @@ class Cadastro {
   async login(req: Request, res: Response) {
     const { email, senha } = req.body;
 
+    if (!email || !senha) {
+      return res.status(400).json({ error: "Email e senha são obrigatórios" });
+    }
+
+    let client: MongoClient | null = null;
+
     try {
-      const client: MongoClient = await pool.connect(); // Certifique-se de obter uma conexão do pool
+      client = await pool.connect(); // Conectar ao banco de dados
       const db = client.db(DB_NAME);
       const collection = db.collection("login");
 
+      // Verifica se o usuário existe
       const user = await collection.findOne({ email });
 
       if (user && bcrypt.compareSync(senha, user.senha)) {
@@ -27,30 +34,39 @@ class Cadastro {
         const token = jwt.sign(
           { id: userWithoutPassword._id.toString() },
           SECRET_KEY,
-          {
-            expiresIn: "1h",
-          }
+          { expiresIn: "1h" }
         );
         res.status(200).json({ token, user: userWithoutPassword });
       } else {
         res.status(401).json({ error: "Credenciais inválidas" });
       }
     } catch (error) {
-      console.error("Erro:", error);
+      console.error("Erro ao fazer login:", error);
       res.status(500).json({ error: "Erro interno do servidor" });
     } finally {
-      await pool.close();
+      if (client) {
+        await client.close(); // Fechar a conexão com o banco de dados
+      }
     }
   }
 
   async register(req: Request, res: Response) {
     const { email, senha, nome } = req.body;
 
+    if (!email || !senha || !nome) {
+      return res
+        .status(400)
+        .json({ error: "Email, senha e nome são obrigatórios" });
+    }
+
+    let client: MongoClient | null = null;
+
     try {
-      const client: MongoClient = await pool.connect(); // Certifique-se de obter uma conexão do pool
+      client = await pool.connect(); // Conectar ao banco de dados
       const db = client.db(DB_NAME);
       const collection = db.collection("login");
 
+      // Verifica se o usuário já existe
       const existingUser = await collection.findOne({ email });
 
       if (existingUser) {
@@ -72,6 +88,7 @@ class Cadastro {
         createdAt: new Date(),
       };
 
+      // Insere o novo usuário na coleção
       const result = await collection.insertOne(newUser);
 
       // Cria um token JWT
@@ -84,10 +101,8 @@ class Cadastro {
         user: { ...newUser, _id: result.insertedId, senha: undefined },
       });
     } catch (error) {
-      console.error("Erro:", error);
+      console.error("Erro ao registrar usuário:", error);
       res.status(500).json({ error: "Erro interno do servidor" });
-    } finally {
-      await pool.close();
     }
   }
 }

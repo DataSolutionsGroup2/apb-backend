@@ -3,7 +3,7 @@ import nodemailer from "nodemailer";
 import dotenv from "dotenv";
 import { MongoClient } from "mongodb";
 
-dotenv.config(); // Carregar variáveis de ambiente do arquivo .env
+dotenv.config();
 
 const DB_NAME = "abp";
 
@@ -72,8 +72,6 @@ Equipe Burnfit `,
     } catch (error) {
       console.error("Erro ao enviar email:", error);
       res.status(500).json({ error: "Erro ao enviar email de recuperação" });
-    } finally {
-      await client.close(); // Fechar a conexão com o banco de dados
     }
   }
 }
