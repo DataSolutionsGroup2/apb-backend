@@ -84,36 +84,6 @@ class CasdastroErecuperacao {
       res.status(500).json({ error: "Erro interno do servidor" });
     }
   }
-
-  async recoverPassword(req: Request, res: Response) {
-    const { email } = req.body;
-
-    try {
-      const client: MongoClient = pool;
-      const db = client.db(DB_NAME);
-      const collection = db.collection("login");
-
-      // Verifica se o usuário existe
-      const user = await collection.findOne({ email });
-
-      if (!user) {
-        return res.status(404).json({ error: "Usuário não encontrado" });
-      }
-
-      // Simula o envio de email de recuperação de senha
-      // Em um ambiente real, você utilizaria um serviço de email como Nodemailer, SendGrid, etc.
-      console.log(
-        `Simulação de envio de email para ${email} com link de recuperação de senha.`
-      );
-
-      res
-        .status(200)
-        .json({ message: "Email de recuperação enviado com sucesso" });
-    } catch (error) {
-      console.error("Erro:", error);
-      res.status(500).json({ error: "Erro interno do servidor" });
-    }
-  }
 }
 
 export default CasdastroErecuperacao;

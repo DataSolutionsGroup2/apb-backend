@@ -1,25 +1,28 @@
 import express from "express";
-import { authenticateToken } from "../Controladores/authMiddleware";
 import AuthController from "../Controladores/PostLogin";
-import CasdastroErecuperacao from "../Controladores/CadastroRecuperação";
+import CadastroERecuperacao from "../Controladores/CadastroRecuperação";
+import RedefinicaoSenha from "../Controladores/RecuperaçãoSenha";
+import EmailController from "../Controladores/PostResetSenha";
 
 const router = express.Router();
 
 const authController = new AuthController();
-const registers = new CasdastroErecuperacao();
-const recovers = new CasdastroErecuperacao();
+const cadastroERecuperacao = new CadastroERecuperacao();
+const redefinicaoSenha = new RedefinicaoSenha();
+const emailController = new EmailController();
 
 // Rota de login
 router.post("/login", authController.login);
 
 // Rota de cadastro de usuário (registro)
-router.post("/register", registers.register);
+router.post("/register", cadastroERecuperacao.register);
 
 // Rota de recuperação de senha
-router.post("/recover-password", recovers.recoverPassword);
+router.post("/recuperacao-senha", redefinicaoSenha.resetPassword);
 
-// Outras rotas que necessitam de autenticação
-// Exemplo: Criação de congregação com restrição de acesso
-// router.post("/congregacao", authenticateToken, someController.someMethod);
+// Rota de envio de email de recuperação
+router.post("/reset", (req, res) =>
+  emailController.enviarEmailDeRecuperacao(req, res)
+);
 
 export default router;
