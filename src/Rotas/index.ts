@@ -13,7 +13,7 @@ const redefinicaoSenha = new RedefinicaoSenha();
 const emailController = new EmailController();
 
 // Rota de login
-router.post("/login", authenticateToken, authController.login);
+router.post("/login", authController.login);
 
 // Rota de cadastro de usuário (registro)
 router.post("/register", cadastro.register);
