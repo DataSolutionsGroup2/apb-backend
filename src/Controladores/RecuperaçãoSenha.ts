@@ -26,7 +26,6 @@ class RedefinicaoSenha {
       const db = client.db(DB_NAME);
       const collection = db.collection("login");
 
-      // Verificar se o código de recuperação é válido
       const user = await collection.findOne({
         email,
         recoveryCode,
@@ -42,23 +41,19 @@ class RedefinicaoSenha {
 
       const hashedPassword = bcrypt.hashSync(newPassword, 10);
 
-      // Gerar um novo código de recuperação aleatório de 6 dígitos
       const newRecoveryCode = Math.floor(
         100000 + Math.random() * 900000
       ).toString();
 
-      // Atualizar a senha e o código de recuperação com um novo código gerado
       await collection.updateOne(
         { email, recoveryCode },
         {
           $set: {
             senha: hashedPassword,
-            recoveryCode: newRecoveryCode, // Atualiza o código de recuperação
+            recoveryCode: newRecoveryCode,
           },
         }
       );
-
-      // Aqui você pode implementar o envio do novo código de recuperação para o e-mail do usuário, se desejar
 
       res.status(200).json({ message: "Senha redefinida com sucesso" });
     } catch (error) {
