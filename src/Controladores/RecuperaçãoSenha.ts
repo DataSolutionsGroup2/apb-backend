@@ -2,12 +2,10 @@ import { Request, Response } from "express";
 import { MongoClient } from "mongodb";
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
-
-dotenv.config();
-
-const DB_NAME = "abp";
-
 import pool from "./db";
+
+const DB_NAME = process.env.DB_NAME;
+dotenv.config();
 
 class RedefinicaoSenha {
   async resetPassword(req: Request, res: Response) {

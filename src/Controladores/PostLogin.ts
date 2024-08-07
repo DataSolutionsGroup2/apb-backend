@@ -7,7 +7,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const SECRET_KEY = process.env.SECRET_KEY || "default_secret_key";
-const DB_NAME = "abp";
+const DB_NAME = process.env.DB_NAME;
 
 import pool from "./db";
 

@@ -2,12 +2,10 @@ import express, { Request, Response } from "express";
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
 import { MongoClient } from "mongodb";
-
+import pool from "./db";
 dotenv.config();
 
-const DB_NAME = "abp";
-
-import pool from "./db";
+const DB_NAME = process.env.DB_NAME;
 
 class EmailController {
   private transporter: nodemailer.Transporter;

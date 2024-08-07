@@ -3,13 +3,12 @@ import { MongoClient } from "mongodb";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import pool from "./db";
 
 dotenv.config();
 
 const SECRET_KEY = process.env.SECRET_KEY || "default_secret_key";
-const DB_NAME = "abp";
-
-import pool from "./db";
+const DB_NAME = process.env.DB_NAME;
 
 class Cadastro {
   async login(req: Request, res: Response) {
