@@ -64,10 +64,6 @@ class RedefinicaoSenha {
     } catch (error) {
       console.error("Erro:", error);
       res.status(500).json({ error: "Erro interno do servidor" });
-    } finally {
-      if (client) {
-        client.close();
-      }
     }
   }
 }
