@@ -52,14 +52,14 @@ class EmailController {
       subject: "Recuperação de Senha",
       text: `Olá!
 
-Você solicitou a recuperação de senha para acessar o aplicativo Burnfit. Para redefinir sua senha, por favor, use o código a seguir:
+              Você solicitou a recuperação de senha para acessar o aplicativo Burnfit. Para redefinir sua senha, por favor, use o código a seguir:
 
-${recoveryCode}
+              ${recoveryCode}
 
-Se você não fez essa solicitação, por favor, ignore este e-mail.
+              Se você não fez essa solicitação, por favor, ignore este e-mail.
 
-Obrigado,
-Equipe Burnfit `,
+              Obrigado,
+              Equipe Burnfit `,
     };
 
     try {
