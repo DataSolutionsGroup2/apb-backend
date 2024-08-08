@@ -5,7 +5,7 @@ import RedefinicaoSenha from "../Controladores/RecuperaçãoSenha";
 import EmailController from "../Controladores/PostResetSenha";
 import { authenticateToken } from "../Controladores/authMiddleware";
 
-const router = express.Router();
+export const router = express.Router();
 
 const authController = new AuthController();
 const cadastro = new Cadastro();
@@ -14,9 +14,6 @@ const emailController = new EmailController();
 
 // Rota de login
 router.post("/login", authController.login);
-
-// Rota de cadastro de usuário (registro)
-router.post("/register", cadastro.register);
 
 // Rota de recuperação de senha
 router.post("/recuperacao-senha", redefinicaoSenha.resetPassword);
