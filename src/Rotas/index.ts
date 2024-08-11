@@ -26,5 +26,15 @@ router.post("/reset", (req, res) =>
   emailController.enviarEmailDeRecuperacao(req, res)
 );
 
-//router.post("/login", authenticateToken, authController.login);  ex de rota com proteção com token que já está sendo ultilizado em todas as solicitações do front.
+// Rota para autenticação com Google
+router.get("/auth/google", authController.googleLogin);
+
+// Rota de callback do Google
+router.get("/auth/google/callback", (req, res) =>
+  authController.googleCallback(req, res)
+);
+
+// Exemplo de rota protegida com autenticação JWT
+//router.post("/login", authenticateToken, authController.login);
+
 export default router;
